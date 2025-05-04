@@ -30,6 +30,6 @@ jobs:
       with:
         tag_name: ${{ github.ref_name }}
         name: Release ${{ github.ref_name }}
-        files: build/libs/java-ssl-test-v1.0.15.jar
+        files: build/libs/java-ssl-test-${{ github.ref_name }}.jar
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

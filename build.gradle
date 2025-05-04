@@ -11,7 +11,43 @@ apply plugin: 'java-library'
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
-version = 'v1.0.15'
+// Function to get version from Git tag or provide a default
+def getVersionName = { ->
+    try {
+        // Check if .git directory exists to avoid errors in non-git environments
+        if (!file('.git').exists()) {
+            return "0.0.1-SNAPSHOT" // Default if not a git repo
+        }
+        // Execute git describe to get the most recent tag
+        def stdout = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'describe', '--tags', '--abbrev=0'
+            standardOutput = stdout
+            ignoreExitValue = true // Don't fail if no tags found yet
+        }
+        def tag = stdout.toString().trim()
+        // If git describe fails or returns nothing (e.g., no tags), use a default
+        if (tag.isEmpty()) {
+             // Optionally, get commit hash for snapshot version
+             stdout = new ByteArrayOutputStream()
+             exec {
+                 commandLine 'git', 'rev-parse', '--short', 'HEAD'
+                 standardOutput = stdout
+             }
+            return "0.0.1-${stdout.toString().trim()}-SNAPSHOT"
+        } else {
+            return tag
+        }
+    } catch (Exception e) {
+        // Fallback in case of any other error executing git
+        println "Could not determine version from Git: ${e.message}"
+        return "0.0.1-SNAPSHOT"
+    }
+}
+
+version =  getVersionName()
+project.ext.buildTimestamp = new Date().format('yyyy-MM-dd HH:mm:ss Z') // Store timestamp
+println "Building version: ${version}"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 // In this section you declare where to find the dependencies of your project
@@ -30,11 +66,14 @@ dependencies {
 
 //create a single Jar with all dependencies
 jar {
+
+    archiveName = "${project.name}-${project.version}.jar" // Ensure filename uses dynamic version
+
     doFirst {
         ant.propertyfile(file: './build/classes/java/main/application.properties') {
             entry(key: 'application.version', value: version)
             entry(key: 'application.builtBy', value: System.getProperty('user.name'))
-            entry(key: 'application.builtDate', value: new Date())
+            entry(key: 'application.builtDate', value: project.ext.buildTimestamp )
             entry(key: 'application.builtJDK', value: System.getProperty('java.version'))
         }
     }
@@ -49,7 +88,7 @@ jar {
                 'Implementation-Version': version,
                 'Main-Class': 'io.vpv.net.SSLTest',
                 'Built-By': System.getProperty('user.name'),
-                'Built-Date': new Date(),
+                'Built-Date': project.ext.buildTimestamp,
                 'Built-JDK': System.getProperty('java.version')
         )
     }
