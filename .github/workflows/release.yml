@@ -20,7 +20,7 @@ jobs:
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: '17'  # change to your required version
+        java-version: '8'  # change to your required version
 
     - name: Build JAR
       run: ./gradlew build
