@@ -80,6 +80,7 @@ public class SSLTest {
         ColorPrintUtil.printKeyValue("-showhandshakeerrors", "         Show SSL/TLS handshake error details");
         ColorPrintUtil.printKeyValue("-showerrors", "                  Show all connection error details");
         ColorPrintUtil.printKeyValue("-hiderejects", "                 Only show protocols/ciphers which were successful");
+        ColorPrintUtil.printKeyValue("-cipherProbeDisable", "          Only show protocols/ciphers which were successful");
         ColorPrintUtil.printKeyValue("-showcerts", "                   Shows some basic Certificate details");
         System.out.println();
         ColorPrintUtil.printKeyValue("-h -help --help", "              Shows this help message");
@@ -118,6 +119,7 @@ public class SSLTest {
         boolean showHandshakeErrors = false;
         boolean showSSLErrors = false;
         boolean showErrors = false;
+        boolean cipherProbeDisable = false;
 
         if (args.length < 1) {
             usage();
@@ -182,6 +184,8 @@ public class SSLTest {
                 connectOnly = true;
             else if ("-hiderejects".equals(arg))
                 hideRejects = true;
+            else if ("-cipherProbeDisable".equals(arg))
+                cipherProbeDisable = true;
             else if ("--version".equals(arg)
                     || "-v".equals(arg)
                     || "-version".equals(arg)) {
@@ -321,6 +325,7 @@ public class SSLTest {
         cipherConfig.setShowHandshakeErrors(showHandshakeErrors);
         cipherConfig.setShowSSLErrors(showSSLErrors);
         cipherConfig.setShowErrors(showErrors);
+        cipherConfig.setCipherProbeDisable(cipherProbeDisable);
         cipherConfig.setKeyManagers(keyManagers);
         cipherConfig.setTrustManagers(trustManagers);
         cipherConfig.setPort(port);
@@ -331,7 +336,10 @@ public class SSLTest {
         cipherConfig.setReportFormat(reportFormat);
         cipherConfig.setErrorReportFormat(errorReportFormat);
 
-        cipherProbe(cipherConfig);
+        if( ! cipherProbeDisable){
+            cipherProbe(cipherConfig);
+        }
+
 
         if (supportedProtocols.isEmpty()) {
             ColorPrintUtil.printErrln("This client supports none of the requested protocols: "

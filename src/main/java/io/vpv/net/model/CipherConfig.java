@@ -31,6 +31,7 @@ public class CipherConfig {
     private String errorReportFormat;
     private Set<String> cipherSuites = new HashSet<>();
     private boolean stop = false;
+    private boolean cipherProbeDisable = false;
     public CipherConfig() {
 
     }
@@ -205,5 +206,12 @@ public class CipherConfig {
 
     public void setStop(boolean stop) {
         this.stop = stop;
+    }
+    public boolean isCipherProbeDisable() {
+        return cipherProbeDisable;
+    }
+
+    public void setCipherProbeDisable(boolean cipherProbeDisable) {
+        this.cipherProbeDisable = cipherProbeDisable;
     }
 }
