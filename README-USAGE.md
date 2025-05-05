@@ -1,5 +1,5 @@
 ```
-java -jar java-ssl-test-*.jar -showcerts  -hiderejects -cipherProbeDisable  www.google.de
+java -jar java-ssl-test-*.jar -showcerts -cipherProbeDisable  www.google.de
 ```
 
 ```
